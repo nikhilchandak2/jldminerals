@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  font-family: "Work Sans", sans-serif;
+  background-color: white;
+  overflow: hidden;
+  width: 100vw;
+}
+
+#root {
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+/* Fullpage.js specific styles */
+.fp-enabled body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden !important;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  width: 100vw !important;
+}
+
+#fullpage {
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+  overflow: hidden;
+}
+
+.fp-section {
+  position: relative;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  height: 100%;
+  width: 100vw !important;
+  display: block;
+  overflow: hidden;
+}
+
+/* Ensure sections take full height and prevent shifting */
+.section {
+  height: 100vh;
+  width: 100vw;
+  display: block;
+  position: relative;
+  will-change: opacity;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Custom fade transition classes */
+.duration-600 {
+  transition-duration: 600ms;
+}
+
+/* Ensure smooth transitions */
+.transition-opacity {
+  transition-property: opacity;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Override any conflicting styles */
+.fp-section.fp-table {
+  display: block !important;
+  width: 100vw !important;
+}
+
+/* Prevent any transform conflicts */
+.fp-section {
+  transform: none !important;
+}
+
+/* Ensure no scrollbars */
+.fp-enabled body {
+  overflow: hidden !important;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.fp-enabled body::-webkit-scrollbar {
+  display: none;
+}
+
+/* Fix for responsive behavior */
+.fp-responsive .fp-section {
+  height: auto !important;
+  min-height: 100vh;
+  width: 100vw !important;
+}
+
+/* Prevent horizontal scrolling */
+* {
+  box-sizing: border-box;
+  max-width: 100vw;
+}
