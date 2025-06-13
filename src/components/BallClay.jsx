@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import LazyImage from './shared/LazyImage';
+import { useHideScrollbar } from '../hooks/useHideScrollbar';
 
 const FINAL_IMAGE_WIDTH = 280;
 const FINAL_IMAGE_HEIGHT = 280;
@@ -11,26 +12,17 @@ const BallClay = () => {
   const navigate = useNavigate();
   const [showContent, setShowContent] = useState(true);
 
+  useHideScrollbar();
+
   useEffect(() => {
     // Clear any stored position data
     sessionStorage.removeItem('ballClayImagePosition');
     
-    // Hide scrollbar with CSS
-    const style = document.createElement('style');
-    style.textContent = `
-      .hide-scrollbar {
-        -ms-overflow-style: none;  /* Internet Explorer 10+ */
-        scrollbar-width: none;  /* Firefox */
-      }
-      .hide-scrollbar::-webkit-scrollbar { 
-        display: none;  /* Safari and Chrome */
-      }
-    `;
-    document.head.appendChild(style);
+    // Add product page class to body to override global styles
+    document.body.classList.add('product-page');
     
-    // Cleanup function to remove style when component unmounts
     return () => {
-      document.head.removeChild(style);
+      document.body.classList.remove('product-page');
     };
   }, []);
 
@@ -99,11 +91,10 @@ const BallClay = () => {
         <link rel="preload" as="image" href="/assets/ball-clay.webp" />
       </Helmet>
 
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 relative overflow-hidden font-futura hide-scrollbar">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 font-futura hide-scrollbar">
         {/* Main Content Container */}
         <motion.div
-          className="relative z-20 container mx-auto px-6 py-8 hide-scrollbar"
-          style={{ height: '100vh', overflowY: 'scroll' }}
+          className="container mx-auto px-6 py-8 hide-scrollbar"
           initial={{ opacity: 0 }}
           animate={{ opacity: showContent ? 1 : 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
@@ -121,19 +112,11 @@ const BallClay = () => {
                 <motion.img 
                   src="/assets/jld-logo.png" 
                   alt="JLD Minerals" 
-                  className="h-6 w-auto"
+                  className="h-8 w-auto"
                   loading="lazy"
                 />
                 <motion.button 
-                  onClick={() => {
-                    navigate('/home');
-                    // Use ReactFullpage API to navigate to OurProducts section (index 3)
-                    setTimeout(() => {
-                      if (window.fullpage_api) {
-                        window.fullpage_api.moveTo(4); // Section 4 (OurProducts is at index 3, but fullpage uses 1-based indexing)
-                      }
-                    }, 100);
-                  }}
+                  onClick={() => navigate('/home')}
                   className="text-gray-600 hover:text-jldBlue transition-all duration-300 text-sm font-medium flex items-center gap-2 group"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -144,7 +127,7 @@ const BallClay = () => {
               </div>
 
               {/* Title Section */}
-              <div className="mb-16">
+              <div className="mb-16 mt-12">
                 <motion.h1 
                   className="text-5xl md:text-7xl font-light text-jldBlue mb-4 leading-none tracking-tight"
                   initial={{ opacity: 0, x: -30 }}

@@ -137,17 +137,17 @@ export default function OurProducts() {
                   </div>
                 )}
                 
-                <motion.img
+            <motion.img
                   id={slug === "ball-clay" ? "ball-clay-image" : undefined}
                   layoutId={slug === "ball-clay" ? "ball-clay-image" : undefined}
-                  src={`/assets/${img}`}
-                  alt={name}
+              src={`/assets/${img}`}
+              alt={name}
                   className={`w-48 h-48 object-contain transition-opacity duration-500 ${
                     imagesLoaded[slug] ? 'opacity-100' : 'opacity-0'
                   }`}
-                  loading="lazy"
+              loading="lazy"
                   onLoad={() => handleImageLoad(slug)}
-                />
+            />
               </div>
               
               <motion.h3 

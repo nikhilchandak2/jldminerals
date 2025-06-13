@@ -1,0 +1,185 @@
+/* Complete scrollbar hiding for About Us page */
+* {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+*::-webkit-scrollbar {
+  display: none !important;
+  width: 0px !important;
+  height: 0px !important;
+  background: transparent !important;
+}
+
+/* Hide fullpage navigation */
+#fp-nav {
+  display: none !important;
+}
+
+/* AGGRESSIVE: Disable ALL fullpage.js fade effects */
+.fp-section,
+.fp-section *,
+.fp-tableCell,
+.fp-table,
+.fp-scrollable,
+.fp-scrollable * {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+  transition: none !important;
+  animation: none !important;
+  filter: none !important;
+}
+
+/* Force immediate visibility on all sections */
+.fp-section.active,
+.fp-section.fp-completely,
+.fp-section.fp-table,
+.fp-section[data-anchor] {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateZ(0) !important;
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Enhanced parallax effect styling - TRUE PARALLAX */
+.fp-section[data-anchor="hero"] {
+  background-attachment: fixed !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
+  will-change: transform !important;
+  transform-style: preserve-3d !important;
+}
+
+.fp-section[data-anchor="hero"] .container {
+  will-change: transform !important;
+  transform-style: preserve-3d !important;
+  backface-visibility: hidden !important;
+}
+
+/* CRITICAL: Remove ALL fade effects and transitions */
+.fp-section {
+  transform: translateZ(0) !important;
+  transition: none !important;
+  opacity: 1 !important;
+  will-change: auto !important;
+}
+
+.fp-section.fp-table {
+  display: block !important;
+  transform: translateZ(0) !important;
+  opacity: 1 !important;
+}
+
+.fp-tableCell {
+  display: block !important;
+  height: 100vh !important;
+  vertical-align: top !important;
+  transform: translateZ(0) !important;
+  will-change: auto !important;
+  opacity: 1 !important;
+}
+
+/* Disable any fullpage.js fade animations */
+.fp-section.active,
+.fp-section.fp-completely {
+  opacity: 1 !important;
+  transform: translateZ(0) !important;
+  transition: none !important;
+}
+
+/* Lock scrollable content position */
+.fp-scrollable {
+  scroll-behavior: auto !important;
+  overscroll-behavior: contain !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  transform: translateZ(0) !important;
+  will-change: scroll-position !important;
+  position: relative !important;
+  opacity: 1 !important;
+}
+
+.fp-scrollable::-webkit-scrollbar {
+  display: none !important;
+  width: 0px !important;
+  height: 0px !important;
+}
+
+/* Prevent any margin/padding shifts */
+.fp-section[data-anchor="content"] .fp-scrollable {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+  top: 0 !important;
+}
+
+/* Ensure content containers maintain position */
+.fp-section[data-anchor="content"] .container:first-child {
+  margin-top: 0 !important;
+  padding-top: 16px !important;
+  transform: translateZ(0) !important;
+}
+
+/* Prevent fullpage.js from applying transforms that cause shifts */
+.fp-section[data-anchor="content"] {
+  transform: translateZ(0) !important;
+  backface-visibility: hidden !important;
+  opacity: 1 !important;
+}
+
+/* Lock content during transitions */
+.fp-section.fp-completely .fp-scrollable {
+  transform: translateZ(0) !important;
+  position: relative !important;
+  opacity: 1 !important;
+}
+
+/* Disable any momentum scrolling that might cause shifts */
+.fp-scrollable * {
+  -webkit-overflow-scrolling: auto !important;
+  overflow-scrolling: auto !important;
+}
+
+/* Enhanced parallax for hero background image */
+.fp-section[data-anchor="hero"] [style*="background-image"] {
+  transform-style: preserve-3d !important;
+  backface-visibility: hidden !important;
+  background-attachment: fixed !important;
+  background-position: center center !important;
+  background-size: cover !important;
+}
+
+/* NUCLEAR OPTION: Force remove any fade transitions from fullpage.js */
+.fp-section,
+.fp-section *,
+.fp-tableCell,
+.fp-table,
+.fp-scrollable,
+body,
+html,
+#root {
+  transition: none !important;
+  animation: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+  filter: none !important;
+}
+
+/* Override any CSS3 transforms that fullpage.js might apply */
+.fp-section[style*="transform"],
+.fp-tableCell[style*="transform"],
+.fp-table[style*="transform"] {
+  transform: translateZ(0) !important;
+}
+
+/* Disable any CSS3 transitions */
+.fp-section[style*="transition"],
+.fp-tableCell[style*="transition"],
+.fp-table[style*="transition"] {
+  transition: none !important;
+} 

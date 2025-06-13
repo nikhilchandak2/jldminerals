@@ -3,6 +3,10 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import LazyImage from './shared/LazyImage';
+import StandardPlaceholder from './shared/StandardPlaceholder';
+import FeatureCard from './shared/FeatureCard';
+import RegionCard from './shared/RegionCard';
+import { useHideScrollbar } from '../hooks/useHideScrollbar';
 
 const FINAL_IMAGE_WIDTH = 280;
 const FINAL_IMAGE_HEIGHT = 280;
@@ -14,32 +18,9 @@ const KaolinPage = () => {
   useEffect(() => {
     // Clear any stored position data
     sessionStorage.removeItem('kaolinImagePosition');
-    
-    // Hide scrollbar with CSS
-    const style = document.createElement('style');
-    style.textContent = `
-      .hide-scrollbar {
-        -ms-overflow-style: none;  /* Internet Explorer 10+ */
-        scrollbar-width: none;  /* Firefox */
-      }
-      .hide-scrollbar::-webkit-scrollbar { 
-        display: none;  /* Safari and Chrome */
-      }
-      body {
-        -ms-overflow-style: none;  /* Internet Explorer 10+ */
-        scrollbar-width: none;  /* Firefox */
-      }
-      body::-webkit-scrollbar { 
-        display: none;  /* Safari and Chrome */
-      }
-    `;
-    document.head.appendChild(style);
-    
-    // Cleanup function to remove style when component unmounts
-    return () => {
-      document.head.removeChild(style);
-    };
   }, []);
+
+  useHideScrollbar();
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -133,19 +114,11 @@ const KaolinPage = () => {
                 <motion.img 
                   src="/assets/jld-logo.png" 
                   alt="JLD Minerals" 
-                  className="h-6 w-auto"
+                  className="h-8 w-auto"
                   loading="lazy"
                 />
                 <motion.button 
-                  onClick={() => {
-                    navigate('/home');
-                    // Use ReactFullpage API to navigate to OurProducts section (index 3)
-                    setTimeout(() => {
-                      if (window.fullpage_api) {
-                        window.fullpage_api.moveTo(4); // Section 4 (OurProducts is at index 3, but fullpage uses 1-based indexing)
-                      }
-                    }, 100);
-                  }}
+                  onClick={() => navigate('/home')}
                   className="text-gray-600 hover:text-jldBlue transition-all duration-300 text-sm font-medium flex items-center gap-2 group"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -156,7 +129,7 @@ const KaolinPage = () => {
               </div>
 
               {/* Title Section */}
-              <div className="mb-16">
+              <div className="mb-16 mt-12">
                 <motion.h1 
                   className="text-5xl md:text-7xl font-light text-jldBlue mb-4 leading-none tracking-tight"
                   initial={{ opacity: 0, x: -30 }}
@@ -201,18 +174,18 @@ const KaolinPage = () => {
               </div>
 
               <div className="grid md:grid-cols-2 gap-4">
-                <div className="p-4 bg-gradient-to-br from-jldBlue/5 to-jldRed/5 rounded-lg border border-jldBlue/10 text-center shadow-xl">
+                <FeatureCard>
                   <p className="text-base md:text-lg font-medium text-jldBlue">Providing whiteness and translucency</p>
-                </div>
-                <div className="p-4 bg-gradient-to-br from-jldBlue/5 to-jldRed/5 rounded-lg border border-jldBlue/10 text-center shadow-xl">
+                </FeatureCard>
+                <FeatureCard>
                   <p className="text-base md:text-lg font-medium text-jldBlue">Controlling thermal expansion and shrinkage</p>
-                </div>
-                <div className="p-4 bg-gradient-to-br from-jldBlue/5 to-jldRed/5 rounded-lg border border-jldBlue/10 text-center shadow-xl">
+                </FeatureCard>
+                <FeatureCard>
                   <p className="text-base md:text-lg font-medium text-jldBlue">Acting as a filler to enhance mechanical strength</p>
-                </div>
-                <div className="p-4 bg-gradient-to-br from-jldBlue/5 to-jldRed/5 rounded-lg border border-jldBlue/10 text-center shadow-xl">
+                </FeatureCard>
+                <FeatureCard>
                   <p className="text-base md:text-lg font-medium text-jldBlue">Supporting glaze bonding and surface smoothness</p>
-                </div>
+                </FeatureCard>
               </div>
 
               <div className="mt-6 text-base md:text-lg text-gray-700 leading-relaxed text-justify">
@@ -277,11 +250,7 @@ const KaolinPage = () => {
                         alt={industry.name}
                         className="w-full h-32 object-cover group-hover:scale-110 transition-transform duration-700"
                         containerClassName="w-full h-32"
-                        placeholder={
-                          <div className="w-full h-32 bg-gray-200 animate-pulse flex items-center justify-center">
-                            <div className="w-8 h-8 border-2 border-gray-300 border-t-jldBlue rounded-full animate-spin"></div>
-                          </div>
-                        }
+                        placeholder={<StandardPlaceholder className="w-full h-32" />}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-jldBlue/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     </div>
@@ -321,9 +290,7 @@ const KaolinPage = () => {
 
                 <div className="grid grid-cols-2 gap-3 mb-4">
                   {["Asia", "Middle East", "Africa", "Europe"].map((region, index) => (
-                    <div key={index} className="text-center p-3 bg-gradient-to-br from-jldBlue/5 to-jldRed/5 rounded-lg border border-jldBlue/10 hover:shadow-md hover:scale-105 transition-all duration-300 cursor-pointer shadow-xl">
-                      <h3 className="text-base font-medium text-jldBlue">{region}</h3>
-                    </div>
+                    <RegionCard key={index}>{region}</RegionCard>
                   ))}
                 </div>
 
@@ -403,4 +370,4 @@ const KaolinPage = () => {
   );
 };
 
-export default KaolinPage; 
+export default KaolinPage;

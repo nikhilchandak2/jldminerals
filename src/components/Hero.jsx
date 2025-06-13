@@ -69,7 +69,7 @@ export default function Hero() {
       <AnimatePresence>
         {showContent && (
           <>
-            {/* Logo Animation */}
+      {/* Logo Animation */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -77,27 +77,27 @@ export default function Hero() {
               className="mb-12"
             >
               <img
-                src="/assets/jld-white-logo.png"
-                alt="JLD Minerals"
+        src="/assets/jld-white-logo.png"
+        alt="JLD Minerals"
                 className="h-14 md:h-20"
                 onLoad={() => setLogoLoaded(true)}
-              />
+      />
             </motion.div>
 
-            {/* Hero Content */}
-            <motion.div
+      {/* Hero Content */}
+      <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1, duration: 1, ease: "easeOut" }}
-              className="text-center"
-            >
-              <h1 className="text-2xl md:text-4xl font-semibold mb-4">
-                Crafting the Future of Ceramics
-              </h1>
-              <p className="max-w-xl text-base md:text-lg mx-auto">
-                We lead the ceramic materials value chain with 30+ mines, innovation labs, and clients across 10+ countries.
-              </p>
-            </motion.div>
+        className="text-center"
+      >
+        <h1 className="text-2xl md:text-4xl font-semibold mb-4">
+          Crafting the Future of Ceramics
+        </h1>
+        <p className="max-w-xl text-base md:text-lg mx-auto">
+          We lead the ceramic materials value chain with 30+ mines, innovation labs, and clients across 10+ countries.
+        </p>
+      </motion.div>
           </>
         )}
       </AnimatePresence>

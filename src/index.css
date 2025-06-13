@@ -2,32 +2,104 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body {
+/* Optimized font loading and base styles */
+html {
   margin: 0;
   padding: 0;
-  font-family: "Work Sans", sans-serif;
-  background-color: white;
   height: 100%;
+  /* Optimize font rendering */
+  font-display: swap;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Hardware acceleration */
+  will-change: scroll-position;
+  transform: translateZ(0);
 }
 
-/* Remove scroll-snap since we're using Fullpage.js */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Work Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: white;
+  height: 100%;
+  /* Improve text rendering */
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  /* Hide scrollbar but allow scrolling for all pages */
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Hide scrollbar but allow scrolling for all pages */
+body::-webkit-scrollbar { 
+  display: none;  /* Safari and Chrome */
+}
+
+/* Optimize box model for better performance */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Base section styling for better compatibility */
 section {
   height: 100vh;
   width: 100%;
   display: flex;
   flex-direction: column;
   position: relative;
+  /* Performance optimizations */
+  contain: layout style paint;
+  will-change: transform;
 }
 
-/* Fullpage.js compatibility */
+/* Fullpage.js container optimization - only hide overflow for fullpage */
 #fullpage {
   height: 100vh;
   position: relative;
+  overflow: hidden !important;
+  /* Hardware acceleration */
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
-/* Ensure smooth rendering */
-* {
-  box-sizing: border-box;
+/* Only hide body overflow when fullpage.js is active */
+.fp-enabled {
+  overflow: hidden !important;
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus visibility for better accessibility */
+:focus-visible {
+  outline: 2px solid #2b235e;
+  outline-offset: 2px;
+}
+
+/* Remove default focus styles for mouse users */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Print styles */
+@media print {
+  body {
+    overflow: visible !important;
+  }
+  
+  section {
+    height: auto !important;
+    page-break-inside: avoid;
+  }
 }
 
 /* Optional: Add some base styling for better performance */
@@ -40,4 +112,4 @@ section {
 .fp-viewing-sustainability .fp-section,
 .fp-viewing-contact .fp-section {
   transition: opacity 1s ease-in-out;
-}
+} 

@@ -102,3 +102,19 @@ body {
   box-sizing: border-box;
   max-width: 100vw;
 }
+
+/* Product page overrides to allow scrolling */
+body.product-page {
+  overflow: auto !important;
+  -ms-overflow-style: auto !important;
+  scrollbar-width: auto !important;
+}
+
+body.product-page::-webkit-scrollbar {
+  display: none !important;
+}
+
+body.product-page #root {
+  overflow: visible !important;
+  height: auto !important;
+}

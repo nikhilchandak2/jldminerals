@@ -24,7 +24,7 @@ export default function Industries() {
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 1 }}
       >
-        <h2 className="text-4xl md:text-5xl font-bold text-[#2B235E]">Industries We Serve</h2>
+        <h2 className="text-4xl md:text-5xl font-bold text-jldBlue">Industries We Serve</h2>
         <p className="text-sm md:text-base text-gray-600 mt-2">
           Trusted across industries. Engineered by precision. Built to perform.
         </p>
@@ -67,7 +67,7 @@ export default function Industries() {
               />
               
               {/* Industry Name - Center aligned and moved upwards */}
-              <h3 className="absolute top-1 left-0 right-0 text-center text-lg font-semibold text-[#2B235E] group-hover:scale-105 transition-transform duration-300">
+              <h3 className="absolute top-1 left-0 right-0 text-center text-lg font-semibold text-jldBlue group-hover:scale-105 transition-transform duration-300">
                 {industry.name}
               </h3>
             </motion.div>
