@@ -1,6 +1,6 @@
-import { motion } from 'framer-motion';
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+// Removed motion imports - using CSS fade effects instead
+import React, { useEffect, useState, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import LazyImage from './shared/LazyImage';
 import StandardPlaceholder from './shared/StandardPlaceholder';
@@ -13,14 +13,79 @@ const FINAL_IMAGE_HEIGHT = 280;
 
 const FeldsparPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [showContent, setShowContent] = useState(true);
-
-  useEffect(() => {
-    // Clear any stored position data
-    sessionStorage.removeItem('feldsparImagePosition');
-  }, []);
+  const [isMobile, setIsMobile] = useState(false);
+  const mobileContainerRef = useRef(null);
 
   useHideScrollbar();
+
+  useEffect(() => {
+    // Multiple scroll attempts with different timings to ensure it works
+    const scrollToTop = () => {
+      // Try multiple scroll methods
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      
+      // Scroll any potential container elements
+      const containers = document.querySelectorAll('.overflow-y-auto, .min-h-screen, .container');
+      containers.forEach(container => {
+        container.scrollTop = 0;
+      });
+    };
+
+    // Immediate scroll
+    scrollToTop();
+    
+    // Additional scroll attempts with delays
+    setTimeout(scrollToTop, 10);
+    setTimeout(scrollToTop, 50);
+    setTimeout(scrollToTop, 100);
+    setTimeout(scrollToTop, 200);
+    
+    // Clear any stored position data
+    sessionStorage.removeItem('feldsparImagePosition');
+    
+    // Add product page class to body to override global styles
+    document.body.classList.add('product-page');
+    
+    // Check if mobile
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => {
+      document.body.classList.remove('product-page');
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
+
+  // Set mobile height dynamically
+  const setMobileHeight = () => {
+    if (mobileContainerRef.current && isMobile) {
+      const height = window.innerHeight;
+      mobileContainerRef.current.style.height = `${height}px`;
+    }
+  };
+
+  useEffect(() => {
+    if (isMobile) {
+      setMobileHeight();
+      window.addEventListener('resize', setMobileHeight);
+      window.addEventListener('orientationchange', () => {
+        setTimeout(setMobileHeight, 100);
+      });
+      
+      return () => {
+        window.removeEventListener('resize', setMobileHeight);
+        window.removeEventListener('orientationchange', setMobileHeight);
+      };
+    }
+  }, [isMobile]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -45,40 +110,305 @@ const FeldsparPage = () => {
   // Industry applications with images and navigation
   const industries = [
     { 
-      name: "Vitrified and Porcelain Tiles", 
+      name: "Tiles", 
       image: "/assets/Tile.png",
       route: "/industries/tiles"
     },
     { 
-      name: "Wall & Floor Tiles", 
-      image: "/assets/Tile.png",
-      route: "/industries/tiles"
-    },
-    { 
-      name: "Sanitaryware Bodies", 
+      name: "Sanitaryware", 
       image: "/assets/Sanitary-Ware.png",
-      route: "/industries/sanitaryware"
+      route: "/industries/sanitary-ware"
     },
     { 
-      name: "Tableware & Bone China", 
+      name: "Tableware", 
       image: "/assets/Table-Ware.png",
-      route: "/industries/tableware"
+      route: "/industries/table-ware"
     },
     { 
-      name: "Ceramic Glazes & Engobes", 
-      image: "/assets/Engobe and Glaze.png",
-      route: "/industries/glazes-engobes"
-    },
-    { 
-      name: "Frits, Enamels & Glassware", 
+      name: "Electrical Porcelain", 
       image: "/assets/Electrical Porcelain.png",
       route: "/industries/electrical-porcelain"
+    },
+    { 
+      name: "Glazes & Engobes", 
+      image: "/assets/Engobe and Glaze.png",
+      route: "/industries/glazes-engobes"
     }
   ];
 
   const handleIndustryClick = (route) => {
-    navigate(route);
+    // Pass state to indicate where the user came from
+    navigate(route, { state: { from: '/products/feldspar' } });
   };
+
+  const handleBackClick = () => {
+    try {
+      // Get where user came from via React Router state
+      const fromPage = location.state?.from;
+      
+      // Debug logging
+      console.log('FeldsparPage - Back button clicked');
+      console.log('From page (state):', fromPage);
+      console.log('Document referrer:', document.referrer);
+      
+      // Check React Router state first (most reliable)
+      if (fromPage) {
+        if (fromPage.includes('/industries/')) {
+          console.log('Navigating back to:', fromPage);
+          navigate(fromPage);
+          return;
+        } else if (fromPage === '/home#products' || fromPage.includes('#products')) {
+          console.log('Navigating back to Products section');
+          navigate('/home#products');
+          return;
+        }
+      }
+      
+      // Check document.referrer for initial navigation only
+      const referrer = document.referrer;
+      if (referrer && referrer.includes('/home') && referrer.includes('#products')) {
+        console.log('Using referrer to go back to Products section');
+        navigate('/home#products');
+        return;
+      }
+      
+      // Default: go to products section of homepage
+      // This ensures Feldspar always goes back to Products section when not coming from an industry page
+      console.log('Using fallback to Products section');
+      navigate('/home#products');
+      
+    } catch (error) {
+      console.error('Navigation error:', error);
+      navigate('/home#products');
+    }
+  };
+
+  // Mobile Layout
+  if (isMobile) {
+    return (
+      <>
+        <Helmet>
+          <title>Feldspar - High-Purity Potassium & Sodium Feldspar for Ceramic Excellence | JLD Minerals</title>
+          <meta
+            name="description"
+            content="High-purity potassium and sodium feldspar from JLD Minerals. India's largest K-feldspar reserve. Global export to 25+ countries with technical support for ceramic applications."
+          />
+          <link rel="canonical" href="https://jldminerals.com/products/feldspar" />
+          <link rel="preload" as="image" href="/assets/feldspar.webp" />
+        </Helmet>
+
+        <div 
+          ref={mobileContainerRef}
+          className="bg-gradient-to-br from-gray-50 to-blue-50 overflow-y-auto font-futura"
+        >
+          {/* Mobile Header */}
+          <div 
+            className="flex justify-between items-center p-4 pt-8"
+          >
+            <img 
+              src="/assets/jld-logo.png" 
+              alt="JLD Minerals" 
+              className="h-6 w-auto"
+              loading="lazy"
+            />
+            <button 
+              onClick={handleBackClick}
+              className="text-gray-600 hover:text-jldBlue transition-colors text-sm font-medium flex items-center gap-1"
+            >
+              <span>←</span>
+              <span>Back</span>
+            </button>
+          </div>
+
+          {/* Mobile Content */}
+          <div className="px-4 pb-8 space-y-6">
+            {/* Title Section */}
+            <div 
+              className="text-center"
+            >
+              <h1 className="text-4xl font-light text-jldBlue mb-2 leading-tight">
+                Feldspar
+              </h1>
+              <p className="text-lg text-gray-500 mb-4 font-light leading-relaxed">
+                High-Purity Potassium & Sodium Feldspar for Ceramic Excellence
+              </p>
+              <div className="w-16 h-1 bg-gradient-to-r from-jldBlue to-jldRed mx-auto" />
+            </div>
+
+            {/* What is Feldspar - Mobile Optimized */}
+            <div 
+              className="bg-white rounded-xl p-6 shadow-lg"
+            >
+              <h2 className="text-xl font-light text-jldBlue mb-4 text-center">
+                What is Feldspar?
+              </h2>
+              
+              <div className="text-sm text-gray-700 leading-relaxed space-y-3 text-justify">
+                <p>
+                  Feldspar is a group of alumino-silicate minerals containing varying amounts of potassium (K) and sodium (Na). It plays a critical role in ceramic, glass, and enamel formulations due to its function as a flux — reducing firing temperatures and improving vitrification.
+                </p>
+                <p>
+                  In ceramics, feldspar helps lower the melting point of the ceramic body, improve density, strength, and gloss, enhance glaze melt fluidity and surface smoothness, and support color development and glass phase formation.
+                </p>
+              </div>
+            </div>
+
+            {/* JLD Expertise - Mobile Optimized */}
+            <div 
+              className="bg-gradient-to-r from-jldBlue to-jldBlue/90 rounded-xl p-6 text-white shadow-lg"
+            >
+              <h2 className="text-lg font-light mb-3 text-center">
+                Feldspar at JLD Minerals
+              </h2>
+              <div className="w-12 h-1 bg-jldRed mx-auto mb-4" />
+              
+              <div className="text-sm leading-relaxed space-y-3 text-justify">
+                <p>
+                  JLD Minerals is a trusted supplier of both potassium feldspar (K-feldspar) and sodium feldspar (Na-feldspar), offering a wide range of high-purity grades suited for both ceramic body formulations and glaze applications.
+                </p>
+                <p>
+                  We offer feldspar in powder as well as chips form, with precisely controlled chemical and physical properties tailored to meet specific manufacturing needs in tiles, sanitaryware, tableware, glazes, engobes, frits.
+                </p>
+              </div>
+            </div>
+
+            {/* World-Class Reserve - Mobile Optimized */}
+            <div 
+              className="bg-white rounded-xl p-6 shadow-lg"
+            >
+              <h2 className="text-lg font-light text-jldBlue mb-3 text-center">
+                A World-Class Potassium Feldspar Reserve
+              </h2>
+              <div className="w-12 h-1 bg-gradient-to-r from-jldBlue to-jldRed mx-auto mb-4" />
+              
+              <div className="text-sm text-gray-700 leading-relaxed space-y-3 text-justify">
+                <p>
+                  JLD Minerals owns and operates India's largest potassium feldspar deposit, spread across 135 hectares near Ajmer, Rajasthan. This reserve is not only the largest by scale but is also considered one of the highest-quality K-feldspar sources globally, known for its low iron content, stable chemistry, and superior whiteness.
+                </p>
+                <p>
+                  This strategic asset enables JLD to offer unmatched reliability, volume capacity, and consistent high performance — critical for both body fluxing and glazing applications.
+                </p>
+              </div>
+            </div>
+
+            {/* Applications - Mobile Optimized */}
+            <div 
+              className="bg-white rounded-xl p-6 shadow-lg"
+            >
+              <h2 className="text-lg font-light text-jldBlue mb-3 text-center">
+                Key Applications
+              </h2>
+              <div className="w-12 h-1 bg-gradient-to-r from-jldBlue to-jldRed mx-auto mb-4" />
+              
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                {industries.map((industry, index) => (
+                  <div 
+                    key={index}
+                    className="group cursor-pointer bg-gray-50 rounded-lg shadow-md overflow-hidden border border-gray-100 hover:border-jldBlue/30 transition-all duration-300"
+                    onClick={() => handleIndustryClick(industry.route)}
+                  >
+                    <div className="relative overflow-hidden">
+                      <LazyImage
+                        src={industry.image} 
+                        alt={industry.name}
+                        className="w-full h-20 object-cover group-hover:scale-110 transition-transform duration-500"
+                        containerClassName="w-full h-20"
+                        placeholder={<StandardPlaceholder className="w-full h-20" />}
+                      />
+                    </div>
+                    
+                    <div className="p-2 text-center">
+                      <h3 className="text-xs font-light text-jldBlue mb-1 group-hover:text-jldRed transition-colors duration-300 leading-tight">
+                        {industry.name}
+                      </h3>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              <p className="text-xs text-gray-600 leading-relaxed text-center">
+                Each application demands specific melt behavior and chemical interaction — and JLD's feldspar grades are engineered to meet the precise functional needs of your formulation.
+              </p>
+            </div>
+
+            {/* Global Reach & Supply - Mobile Optimized */}
+            <div 
+              className="bg-gradient-to-br from-gray-900 to-jldBlue rounded-xl p-6 text-white shadow-lg"
+            >
+              <h2 className="text-lg font-light mb-3 text-center">
+                Global Reach & Supply
+              </h2>
+              <div className="w-12 h-1 bg-jldRed mx-auto mb-4" />
+              
+              <div className="text-sm leading-relaxed space-y-3 text-justify">
+                <p>
+                  JLD Minerals exports feldspar to over 25 countries, supporting manufacturers across Asia, Middle East, Africa, and Europe. Our clients trust us for technical accuracy, on-time delivery, and application-specific consistency — batch after batch.
+                </p>
+                <div className="space-y-2">
+                  <div className="flex items-start">
+                    <div className="w-1.5 h-1.5 bg-jldRed rounded-full flex-shrink-0 mt-2 mr-3" />
+                    <p className="text-justify">Available in 50kgs bags/1 MT jumbo bags and customized chip loads</p>
+                  </div>
+                  <div className="flex items-start">
+                    <div className="w-1.5 h-1.5 bg-jldRed rounded-full flex-shrink-0 mt-2 mr-3" />
+                    <p className="text-justify">Supplied in powder or chip form based on client requirements</p>
+                  </div>
+                  <div className="flex items-start">
+                    <div className="w-1.5 h-1.5 bg-jldRed rounded-full flex-shrink-0 mt-2 mr-3" />
+                    <p className="text-justify">End-to-end logistics coordination for domestic and global dispatches</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Partnership - Mobile Optimized */}
+            <div 
+              className="bg-white rounded-xl p-6 shadow-lg"
+            >
+              <h2 className="text-lg font-light text-jldBlue mb-3 text-center">
+                Partnering Beyond Supply
+              </h2>
+              <div className="w-12 h-1 bg-gradient-to-r from-jldBlue to-jldRed mx-auto mb-4" />
+              
+              <div className="text-sm text-gray-700 leading-relaxed space-y-3 text-justify">
+                <p>
+                  JLD Minerals works as more than a material vendor — we are your technical ally in ceramic production. Our team engages with manufacturers to fine-tune feldspar usage, troubleshoot production inefficiencies, and enhance firing performance and glaze results.
+                </p>
+                <p>
+                  With the largest K-feldspar mine in India, a broad product portfolio, and strong in-house expertise, we help our clients optimize quality, reduce costs, and scale with confidence.
+                </p>
+              </div>
+            </div>
+
+            {/* CTA - Mobile Optimized */}
+            <div 
+              className="bg-gradient-to-r from-jldBlue to-jldRed rounded-xl p-6 text-white text-center"
+            >
+              <h2 className="text-lg font-light mb-3">
+                Consult Our Experts
+              </h2>
+              <div className="w-12 h-1 bg-white mx-auto mb-4" />
+              
+              <p className="text-sm leading-relaxed mb-2 text-justify">
+                Need help choosing the right feldspar grade for your glaze or body formulation?
+              </p>
+              
+              <p className="text-xs leading-relaxed mb-4 opacity-90 text-justify">
+                Connect with our team for technical guidance and customized recommendations.
+              </p>
+
+              <button
+                className="bg-white text-jldBlue px-6 py-2 rounded-full font-medium text-sm hover:bg-gray-100 transition-colors active:scale-95"
+                onClick={() => navigate('/contact', { state: { from: '/products/feldspar' } })}
+              >
+                Contact Our Technical Team
+              </button>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -92,74 +422,56 @@ const FeldsparPage = () => {
         <link rel="preload" as="image" href="/assets/feldspar.webp" />
       </Helmet>
 
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 relative overflow-hidden font-futura hide-scrollbar">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 font-futura hide-scrollbar overflow-y-auto">
         {/* Main Content Container */}
-        <motion.div
-          className="relative z-20 container mx-auto px-6 py-8 hide-scrollbar"
-          style={{ height: '100vh', overflowY: 'scroll' }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: showContent ? 1 : 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
+        <div
+          className="container mx-auto px-6 py-8"
         >
-          <motion.div 
+          <div 
             className="max-w-7xl mx-auto space-y-12"
-            variants={containerVariants}
             initial="hidden"
-            animate={showContent ? "visible" : "hidden"}
           >
             {/* Header */}
-            <motion.div variants={itemVariants}>
+            <div>
               {/* Logo and Back Button Row */}
               <div className="flex justify-between items-center mb-8">
-                <motion.img 
+                <img 
                   src="/assets/jld-logo.png" 
                   alt="JLD Minerals" 
                   className="h-8 w-auto"
                   loading="lazy"
                 />
-                <motion.button 
-                  onClick={() => navigate('/home')}
+                <button 
+                  onClick={handleBackClick}
                   className="text-gray-600 hover:text-jldBlue transition-all duration-300 text-sm font-medium flex items-center gap-2 group"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
                 >
                   <span className="transform group-hover:-translate-x-1 transition-transform duration-300">←</span>
                   <span>Back to Products</span>
-                </motion.button>
+                </button>
               </div>
 
               {/* Title Section */}
               <div className="mb-16 mt-12">
-                <motion.h1 
+                <h1 
                   className="text-5xl md:text-7xl font-light text-jldBlue mb-4 leading-none tracking-tight"
-                  initial={{ opacity: 0, x: -30 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.8, delay: 0.3 }}
                 >
                   Feldspar
-                </motion.h1>
+                </h1>
                 
-                <motion.p 
+                <p 
                   className="text-xl md:text-2xl text-gray-500 mb-6 font-light leading-relaxed max-w-3xl"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.8, delay: 0.5 }}
                 >
                   High-Purity Potassium & Sodium Feldspar for Ceramic Excellence
-                </motion.p>
+                </p>
 
-                <motion.div 
+                <div 
                   className="w-24 h-1 bg-gradient-to-r from-jldBlue to-jldRed"
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ duration: 0.8, delay: 0.7 }}
-                  style={{ transformOrigin: 'left' }}
                 />
               </div>
-            </motion.div>
+            </div>
 
             {/* What is Feldspar */}
-            <motion.div variants={itemVariants} className="bg-jldWhite rounded-2xl p-8 shadow-xl">
+            <div className="bg-jldWhite rounded-2xl p-8 shadow-xl">
               <h2 className="text-3xl md:text-4xl font-light text-jldBlue mb-6 leading-tight text-center">
                 What is Feldspar?
               </h2>
@@ -174,23 +486,23 @@ const FeldsparPage = () => {
               </div>
 
               <div className="grid md:grid-cols-2 gap-4">
-                <FeatureCard>
+                <div className="p-4 bg-gradient-to-br from-jldBlue/5 to-jldRed/5 rounded-lg border border-jldBlue/10 text-center shadow-xl">
                   <p className="text-base md:text-lg font-medium text-jldBlue">Lower the melting point of the ceramic body</p>
-                </FeatureCard>
-                <FeatureCard>
+                </div>
+                <div className="p-4 bg-gradient-to-br from-jldBlue/5 to-jldRed/5 rounded-lg border border-jldBlue/10 text-center shadow-xl">
                   <p className="text-base md:text-lg font-medium text-jldBlue">Improve density, strength, and gloss</p>
-                </FeatureCard>
-                <FeatureCard>
+                </div>
+                <div className="p-4 bg-gradient-to-br from-jldBlue/5 to-jldRed/5 rounded-lg border border-jldBlue/10 text-center shadow-xl">
                   <p className="text-base md:text-lg font-medium text-jldBlue">Enhance glaze melt fluidity and surface smoothness</p>
-                </FeatureCard>
-                <FeatureCard>
+                </div>
+                <div className="p-4 bg-gradient-to-br from-jldBlue/5 to-jldRed/5 rounded-lg border border-jldBlue/10 text-center shadow-xl">
                   <p className="text-base md:text-lg font-medium text-jldBlue">Support color development and glass phase formation</p>
-                </FeatureCard>
+                </div>
               </div>
-            </motion.div>
+            </div>
 
             {/* JLD Minerals Expertise */}
-            <motion.div variants={itemVariants} className="bg-gradient-to-r from-jldBlue to-jldBlue/90 rounded-2xl p-8 text-jldWhite shadow-xl">
+            <div className="bg-gradient-to-r from-jldBlue to-jldBlue/90 rounded-2xl p-8 text-jldWhite shadow-xl">
               <div className="text-center mb-8">
                 <h2 className="text-4xl md:text-5xl font-light mb-4 leading-tight">
                   Feldspar at JLD Minerals
@@ -202,18 +514,12 @@ const FeldsparPage = () => {
               </div>
 
               <p className="text-base md:text-lg leading-relaxed opacity-80 text-center max-w-5xl mx-auto">
-                We offer feldspar in powder as well as chips form, with precisely controlled chemical and physical properties tailored to meet specific manufacturing needs in:
+                We offer feldspar in powder as well as chips form, with precisely controlled chemical and physical properties tailored to meet specific manufacturing needs in tiles, sanitaryware, tableware, glazes, engobes, frits, and glass applications.
               </p>
-
-              <div className="mt-6 text-base md:text-lg leading-relaxed opacity-80 text-center max-w-5xl mx-auto">
-                <p>
-                  Tiles (Porcelain, Vitrified, Wall & Floor Tiles), Sanitaryware and Tableware, Glazes, Engobes, and Frits, Glass and Enamel.
-                </p>
-              </div>
-            </motion.div>
+            </div>
 
             {/* World-Class Reserve */}
-            <motion.div variants={itemVariants} className="bg-jldWhite rounded-2xl p-8 shadow-xl">
+            <div className="bg-jldWhite rounded-2xl p-8 shadow-xl">
               <h2 className="text-3xl md:text-4xl font-light text-jldBlue mb-6 leading-tight text-center">
                 A World-Class Potassium Feldspar Reserve
               </h2>
@@ -226,10 +532,10 @@ const FeldsparPage = () => {
                   This strategic asset enables JLD to offer unmatched reliability, volume capacity, and consistent high performance — critical for both body fluxing and glazing applications.
                 </p>
               </div>
-            </motion.div>
+            </div>
 
             {/* Applications */}
-            <motion.div variants={itemVariants}>
+            <div>
               <div className="text-center mb-8">
                 <h2 className="text-4xl md:text-5xl font-light text-jldBlue mb-4 leading-tight">
                   Key Applications
@@ -242,16 +548,9 @@ const FeldsparPage = () => {
 
               <div className="flex flex-wrap justify-center gap-4 mb-6">
                 {industries.map((industry, index) => (
-                  <motion.div 
+                  <div 
                     key={index}
                     className="group cursor-pointer bg-jldWhite rounded-xl shadow-xl overflow-hidden border border-gray-100 hover:border-jldBlue/30 transition-all duration-500 w-48"
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1, duration: 0.6 }}
-                    whileHover={{ 
-                      scale: 1.02,
-                      boxShadow: "0 15px 30px rgba(43, 35, 94, 0.15)"
-                    }}
                     onClick={() => handleIndustryClick(industry.route)}
                   >
                     <div className="relative overflow-hidden">
@@ -276,17 +575,17 @@ const FeldsparPage = () => {
                         </svg>
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
 
               <p className="text-base md:text-lg text-gray-600 leading-relaxed text-center max-w-4xl mx-auto">
                 Each application demands specific melt behavior and chemical interaction — and JLD's feldspar grades are engineered to meet the precise functional needs of your formulation.
               </p>
-            </motion.div>
+            </div>
 
             {/* Global Reach & Supply */}
-            <motion.div variants={itemVariants} className="grid md:grid-cols-2 gap-8">
+            <div className="grid md:grid-cols-2 gap-8">
               {/* Global Reach */}
               <div className="bg-jldWhite rounded-xl p-6 shadow-xl">
                 <h2 className="text-2xl md:text-3xl font-light text-jldBlue mb-4 leading-tight">
@@ -299,9 +598,18 @@ const FeldsparPage = () => {
                 </p>
 
                 <div className="grid grid-cols-2 gap-3 mb-4">
-                  {["Asia", "Middle East", "Africa", "Europe"].map((region, index) => (
-                    <RegionCard key={index}>{region}</RegionCard>
-                  ))}
+                  <div className="p-3 bg-gradient-to-br from-jldBlue/5 to-jldRed/5 rounded-lg border border-jldBlue/10 text-center">
+                    <p className="text-sm font-medium text-jldBlue">Asia</p>
+                  </div>
+                  <div className="p-3 bg-gradient-to-br from-jldBlue/5 to-jldRed/5 rounded-lg border border-jldBlue/10 text-center">
+                    <p className="text-sm font-medium text-jldBlue">Middle East</p>
+                  </div>
+                  <div className="p-3 bg-gradient-to-br from-jldBlue/5 to-jldRed/5 rounded-lg border border-jldBlue/10 text-center">
+                    <p className="text-sm font-medium text-jldBlue">Africa</p>
+                  </div>
+                  <div className="p-3 bg-gradient-to-br from-jldBlue/5 to-jldRed/5 rounded-lg border border-jldBlue/10 text-center">
+                    <p className="text-sm font-medium text-jldBlue">Europe</p>
+                  </div>
                 </div>
 
                 <p className="text-base text-gray-600 leading-relaxed">
@@ -333,10 +641,10 @@ const FeldsparPage = () => {
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </div>
 
             {/* Partnership */}
-            <motion.div variants={itemVariants} className="bg-jldWhite rounded-xl p-8 shadow-xl">
+            <div className="bg-jldWhite rounded-xl p-8 shadow-xl">
               <div className="text-center mb-6">
                 <h2 className="text-3xl md:text-4xl font-light text-jldBlue mb-4 leading-tight">
                   Partnering Beyond Supply
@@ -352,10 +660,10 @@ const FeldsparPage = () => {
                   With the largest K-feldspar mine in India, a broad product portfolio, and strong in-house expertise, we help our clients optimize quality, reduce costs, and scale with confidence.
                 </p>
               </div>
-            </motion.div>
+            </div>
 
             {/* CTA */}
-            <motion.div variants={itemVariants} className="bg-gradient-to-r from-jldBlue to-jldRed rounded-xl p-8 text-jldWhite text-center shadow-xl">
+            <div className="bg-gradient-to-r from-jldBlue to-jldRed rounded-xl p-8 text-jldWhite text-center shadow-xl">
               <h2 className="text-3xl md:text-4xl font-light mb-4 leading-tight">
                 Consult Our Experts
               </h2>
@@ -369,16 +677,15 @@ const FeldsparPage = () => {
                 Connect with our team for technical guidance and customized recommendations.
               </p>
 
-              <motion.button
+              <button
                 className="bg-jldWhite text-jldBlue px-8 py-3 rounded-full font-medium text-base md:text-lg hover:bg-gray-100 transition-colors duration-300 shadow-xl"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                onClick={() => navigate('/contact', { state: { from: '/products/feldspar' } })}
               >
                 Contact Our Technical Team
-              </motion.button>
-            </motion.div>
-          </motion.div>
-        </motion.div>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </>
   );

@@ -1,14 +1,35 @@
 import React, { useEffect } from 'react';
-import { motion } from 'framer-motion';
+// Removed motion imports - using CSS fade effects instead
 import { Helmet } from 'react-helmet';
-import { useNavigate } from 'react-router-dom';
-import { useHideScrollbar } from '../../hooks/useHideScrollbar';
-
+import { useNavigate, useLocation } from 'react-router-dom';
 const ElectricalPorcelainPage = () => {
   const navigate = useNavigate();
-  useHideScrollbar();
+  const location = useLocation();
 
   useEffect(() => {
+    // Multiple scroll attempts with different timings to ensure it works
+    const scrollToTop = () => {
+      // Try multiple scroll methods
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      
+      // Scroll any potential container elements
+      const containers = document.querySelectorAll('.overflow-y-auto, .min-h-screen, .container');
+      containers.forEach(container => {
+        container.scrollTop = 0;
+      });
+    };
+
+    // Immediate scroll
+    scrollToTop();
+    
+    // Additional scroll attempts with delays
+    setTimeout(scrollToTop, 10);
+    setTimeout(scrollToTop, 50);
+    setTimeout(scrollToTop, 100);
+    setTimeout(scrollToTop, 200);
+    
     // Add product page class to body to override global styles
     document.body.classList.add('product-page');
     
@@ -100,6 +121,75 @@ const ElectricalPorcelainPage = () => {
     }
   ];
 
+  const handleBackClick = () => {
+    try {
+      // Get where user came from via React Router state
+      const fromPage = location.state?.from;
+      
+      // Debug logging
+      console.log('ElectricalPorcelainPage - Back button clicked');
+      console.log('From page (state):', fromPage);
+      console.log('Document referrer:', document.referrer);
+      
+      // Check React Router state first (most reliable)
+      if (fromPage) {
+        if (fromPage === '/products/ball-clay') {
+          console.log('Navigating back to Ball Clay page');
+          navigate('/products/ball-clay');
+          return;
+        } else if (fromPage === '/products/kaolin') {
+          console.log('Navigating back to Kaolin page');
+          navigate('/products/kaolin');
+          return;
+        } else if (fromPage === '/products/feldspar') {
+          console.log('Navigating back to Feldspar page');
+          navigate('/products/feldspar');
+          return;
+        } else if (fromPage === '/products/quartz-silica') {
+          console.log('Navigating back to Quartz-Silica page');
+          navigate('/products/quartz-silica');
+          return;
+        } else if (fromPage === '/home#industries' || fromPage.includes('#industries')) {
+          console.log('Navigating back to Industries section');
+          navigate('/home#industries');
+          return;
+        }
+      }
+      
+      // Fallback: check document.referrer
+      const referrer = document.referrer;
+      if (referrer && referrer.includes('/products/ball-clay')) {
+        console.log('Using referrer to go back to Ball Clay page');
+        navigate('/products/ball-clay');
+        return;
+      } else if (referrer && referrer.includes('/products/kaolin')) {
+        console.log('Using referrer to go back to Kaolin page');
+        navigate('/products/kaolin');
+        return;
+      } else if (referrer && referrer.includes('/products/feldspar')) {
+        console.log('Using referrer to go back to Feldspar page');
+        navigate('/products/feldspar');
+        return;
+      } else if (referrer && referrer.includes('/products/quartz-silica')) {
+        console.log('Using referrer to go back to Quartz-Silica page');
+        navigate('/products/quartz-silica');
+        return;
+      } else if (referrer && (referrer.includes('/home#industries') || referrer.includes('#industries'))) {
+        console.log('Using referrer to go back to Industries section');
+        navigate('/home#industries');
+        return;
+      }
+      
+      // Default: go to Industries section
+      console.log('Using fallback to Industries section');
+      navigate('/home#industries');
+      
+    } catch (error) {
+      console.error('Navigation error:', error);
+      navigate('/home#industries');
+    }
+  };
+
   return (
     <>
       <Helmet>
@@ -125,13 +215,11 @@ const ElectricalPorcelainPage = () => {
                 loading="lazy"
               />
               <button 
-                onClick={() => {
-                  window.location.replace('/home#industries');
-                }}
-                className="text-gray-600 hover:text-jldBlue transition-all duration-300 text-sm font-medium flex items-center gap-2 group"
+                onClick={handleBackClick}
+                className="text-jldBlue hover:text-jldRed transition-all duration-300 text-sm font-medium flex items-center gap-2 group"
               >
                 <span className="transform group-hover:-translate-x-1 transition-transform duration-300">←</span>
-                <span>Back to Industries</span>
+                <span>Back</span>
               </button>
             </header>
 
@@ -140,7 +228,6 @@ const ElectricalPorcelainPage = () => {
               <div className="max-w-6xl mx-auto space-y-8">
                 <h1 
                   className="text-6xl md:text-8xl font-extralight text-jldBlue tracking-tight leading-none"
-                  style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
                 >
                   Electrical Porcelain
                 </h1>
@@ -326,7 +413,6 @@ const ElectricalPorcelainPage = () => {
                     src="/assets/Electrical Porcelain.png" 
                     alt="Premium Electrical Porcelain Manufacturing"
                     className="w-full object-cover max-w-full"
-                    style={{ height: '960px', opacity: '1', filter: 'none' }}
                   />
                 </div>
               </div>
@@ -377,7 +463,10 @@ const ElectricalPorcelainPage = () => {
                   Consult our technical team to access high-performance clays trusted by the world's leading insulator brands.
                 </p>
 
-                <button className="bg-white text-jldBlue px-8 py-3 rounded-full font-medium hover:bg-gray-100 transition-colors duration-300">
+                <button 
+                  onClick={() => navigate('/contact', { state: { from: '/industries/electrical-porcelain' } })}
+                  className="bg-white text-jldBlue px-8 py-3 rounded-full font-medium hover:bg-gray-100 transition-colors duration-300"
+                >
                   Partner With JLD Minerals
                 </button>
               </div>
@@ -386,22 +475,7 @@ const ElectricalPorcelainPage = () => {
         </div>
       </div>
 
-      <style jsx global>{`
-        /* Hide scrollbar for all elements */
-        * {
-          scrollbar-width: none; /* Firefox */
-        }
-        
-        *::-webkit-scrollbar {
-          display: none; /* Chrome, Safari, Edge */
-        }
-        
-        /* Ensure body can still scroll */
-        body {
-          overflow-y: auto;
-          overflow-x: hidden;
-        }
-      `}</style>
+
     </>
   );
 };

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+// Removed motion imports - using CSS fade effects instead
 import { useNavigate } from "react-router-dom";
 import { useHideScrollbar } from "../hooks/useHideScrollbar";
+import emailjs from '@emailjs/browser';
 
 const CareersPage = () => {
   useHideScrollbar();
@@ -104,20 +105,48 @@ const CareersPage = () => {
     setIsSubmitting(true);
     
     try {
-      const formDataToSend = new FormData();
-      Object.keys(formData).forEach(key => {
-        if (formData[key] !== null) {
-          formDataToSend.append(key, formData[key]);
-        }
-      });
+      // EmailJS Configuration - Using Vite environment variables
+      const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+      const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+      const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
-      // Replace this URL with your actual backend endpoint
-      const response = await fetch('/api/careers/submit', {
-        method: 'POST',
-        body: formDataToSend,
-      });
 
-      if (response.ok) {
+
+      // Check if environment variables are loaded
+      if (!SERVICE_ID || !TEMPLATE_ID || !PUBLIC_KEY) {
+        console.error('EmailJS configuration missing:', {
+          SERVICE_ID: !!SERVICE_ID,
+          TEMPLATE_ID: !!TEMPLATE_ID,
+          PUBLIC_KEY: !!PUBLIC_KEY
+        });
+        setSubmitMessage('Email configuration error. Please contact support.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Prepare template parameters
+      const templateParams = {
+        fullName: formData.fullName,
+        email: formData.email,
+        phone: formData.phone || 'Not provided',
+        position: formData.position,
+        experience: formData.experience,
+        message: formData.message || 'No additional message provided',
+        resume: formData.resume ? formData.resume.name : 'No resume uploaded'
+      };
+
+
+
+      // Send email using EmailJS
+      const response = await emailjs.send(
+        SERVICE_ID,
+        TEMPLATE_ID,
+        templateParams,
+        PUBLIC_KEY
+      );
+
+      if (response.status === 200) {
+
         setSubmitMessage('Application submitted successfully! We will contact you soon.');
         setFormData({
           fullName: '',
@@ -131,9 +160,11 @@ const CareersPage = () => {
         // Reset file input
         document.getElementById('resume').value = '';
       } else {
+        console.error('❌ EmailJS response error:', response);
         setSubmitMessage('Error submitting application. Please try again.');
       }
     } catch (error) {
+      console.error('EmailJS Error:', error);
       setSubmitMessage('Error submitting application. Please try again.');
     }
     
@@ -143,72 +174,54 @@ const CareersPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 font-futura hide-scrollbar overflow-x-hidden max-w-full">
       {/* Main Content Container */}
-      <motion.div
+      <div
         className="container mx-auto px-6 py-8 hide-scrollbar overflow-x-hidden"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: showContent ? 1 : 0 }}
-        transition={{ duration: 0.8, delay: 0.2 }}
       >
-        <motion.div 
+        <div 
           className="max-w-7xl mx-auto space-y-12 overflow-x-hidden"
-          variants={containerVariants}
           initial="hidden"
-          animate={showContent ? "visible" : "hidden"}
         >
           {/* Header */}
-          <motion.div variants={itemVariants}>
+          <div>
             {/* Logo and Back Button Row */}
             <div className="flex justify-between items-center mb-8">
-              <motion.img 
+              <img 
                 src="/assets/jld-logo.png" 
                 alt="JLD Minerals" 
                 className="h-8 w-auto"
                 loading="lazy"
               />
-              <motion.button 
+              <button 
                 onClick={() => navigate('/home')}
                 className="text-jldBlue hover:text-jldRed transition-all duration-300 text-sm font-medium flex items-center gap-2 group"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
               >
                 <span className="transform group-hover:-translate-x-1 transition-transform duration-300">←</span>
                 <span>Back to Home</span>
-              </motion.button>
+              </button>
             </div>
 
             {/* Title Section */}
             <div className="mb-16 mt-12">
-              <motion.h1 
+              <h1 
                 className="text-5xl md:text-6xl lg:text-7xl font-light text-jldBlue mb-4 leading-none tracking-tight"
-                initial={{ opacity: 0, x: -30 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8, delay: 0.3 }}
               >
                 Join Our <span className="text-jldRed font-normal">Team</span>
-              </motion.h1>
+              </h1>
               
-              <motion.p 
+              <p 
                 className="text-xl md:text-2xl text-gray-500 mb-6 font-light leading-relaxed max-w-3xl"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8, delay: 0.5 }}
               >
                 Build your career with India's leading mineral extraction and processing company
-              </motion.p>
+              </p>
 
-              <motion.div 
+              <div 
                 className="w-24 h-1 bg-gradient-to-r from-jldBlue to-jldRed"
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ duration: 0.8, delay: 0.7 }}
-                style={{ transformOrigin: 'left' }}
               />
             </div>
-          </motion.div>
+          </div>
 
           {/* Why Choose JLD Minerals - Smart Boxes in One Line */}
-          <motion.div
-            variants={itemVariants}
+          <div
             className="py-16"
           >
             <div className="text-center mb-16">
@@ -222,24 +235,19 @@ const CareersPage = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
               {benefits.map((benefit, index) => (
-                <motion.div
+                <div
                   key={index}
                   className="bg-white p-4 sm:p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 h-full flex flex-col"
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.1 * index }}
-                  whileHover={{ y: -5 }}
                 >
                   <h3 className="text-base sm:text-lg font-medium text-jldBlue mb-3 text-center">{benefit.title}</h3>
                   <p className="text-gray-700 leading-relaxed text-xs sm:text-sm flex-grow text-center">{benefit.description}</p>
-                </motion.div>
+                </div>
               ))}
             </div>
-          </motion.div>
+          </div>
 
           {/* Career Application Form */}
-          <motion.div
-            variants={itemVariants}
+          <div
             className="py-16"
           >
             <div className="text-center mb-12">
@@ -401,11 +409,10 @@ const CareersPage = () => {
                 )}
               </form>
             </div>
-          </motion.div>
+          </div>
 
           {/* Contact HR */}
-          <motion.div
-            variants={itemVariants}
+          <div
             className="bg-gradient-to-r from-jldBlue to-jldBlue/90 text-white py-16 px-6 rounded-2xl"
           >
             <div className="max-w-4xl mx-auto text-center">
@@ -430,9 +437,9 @@ const CareersPage = () => {
                 </div>
               </div>
             </div>
-          </motion.div>
-        </motion.div>
-      </motion.div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

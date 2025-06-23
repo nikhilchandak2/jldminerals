@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { motion } from "framer-motion";
+import React, { useState, useEffect } from "react";
+// Removed motion imports - using CSS fade effects instead
 import { useNavigate } from "react-router-dom";
 import { useHideScrollbar } from "../hooks/useHideScrollbar";
 
@@ -17,6 +17,73 @@ const ContactUsPage = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
+
+  useEffect(() => {
+    // Add product page class to body immediately to prevent scrollbar flash
+    document.body.classList.add('product-page');
+    
+    // Apply immediate scrollbar hiding styles
+    document.body.style.msOverflowStyle = 'none';
+    document.body.style.scrollbarWidth = 'none';
+    document.documentElement.style.msOverflowStyle = 'none';
+    document.documentElement.style.scrollbarWidth = 'none';
+    
+    // Add webkit scrollbar hiding immediately
+    const style = document.createElement('style');
+    style.id = 'hide-scrollbar-immediate';
+    style.textContent = `
+      body::-webkit-scrollbar,
+      html::-webkit-scrollbar,
+      *::-webkit-scrollbar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+      }
+    `;
+    document.head.appendChild(style);
+    
+    // Multiple scroll attempts to ensure it works
+    const scrollToTop = () => {
+      // Scroll the window
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      
+      // Scroll the document
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      
+      // Scroll any potential scroll containers
+      const scrollContainers = document.querySelectorAll('.overflow-y-auto, .min-h-screen');
+      scrollContainers.forEach(container => {
+        container.scrollTop = 0;
+      });
+    };
+    
+    // Immediate scroll
+    scrollToTop();
+    
+    // Multiple delayed scrolls to handle rendering delays
+    const timers = [
+      setTimeout(scrollToTop, 50),
+      setTimeout(scrollToTop, 100),
+      setTimeout(scrollToTop, 200),
+      setTimeout(scrollToTop, 500)
+    ];
+    
+    return () => {
+      document.body.classList.remove('product-page');
+      // Reset scrollbar styles
+      document.body.style.msOverflowStyle = '';
+      document.body.style.scrollbarWidth = '';
+      document.documentElement.style.msOverflowStyle = '';
+      document.documentElement.style.scrollbarWidth = '';
+      // Remove webkit styles
+      const immediateStyle = document.getElementById('hide-scrollbar-immediate');
+      if (immediateStyle) {
+        document.head.removeChild(immediateStyle);
+      }
+      timers.forEach(timer => clearTimeout(timer));
+    };
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -115,33 +182,24 @@ const ContactUsPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white font-[Futura] product-page">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white font-[Futura] overflow-y-auto">
       {/* Header */}
-      <motion.div
+      <div
         className="relative bg-gradient-to-r from-jldBlue to-jldBlue/90 text-white py-20 px-6"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8 }}
       >
         <div className="max-w-7xl mx-auto">
-          <motion.button
+          <button
             onClick={() => navigate(-1)}
             className="flex items-center gap-2 text-white/80 hover:text-white mb-8 transition-colors"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
             Back
-          </motion.button>
+          </button>
 
-          <motion.div
+          <div
             className="text-center"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
           >
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-light mb-6">
               Contact <span className="text-jldRed font-normal">Us</span>
@@ -149,26 +207,19 @@ const ContactUsPage = () => {
             <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto leading-relaxed">
               Get in touch with our team for all your mineral and mining needs
             </p>
-          </motion.div>
+          </div>
         </div>
-      </motion.div>
+      </div>
 
       {/* Contact Information Cards */}
-      <motion.div
+      <div
         className="max-w-7xl mx-auto px-6 py-16"
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.4 }}
       >
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
           {contactInfo.map((info, index) => (
-            <motion.div
+            <div
               key={index}
               className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-center group cursor-pointer"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 * index }}
-              whileHover={{ y: -5 }}
             >
               <div className="text-jldBlue group-hover:text-jldRed transition-colors mb-4 flex justify-center">
                 {info.icon}
@@ -182,27 +233,19 @@ const ContactUsPage = () => {
               <button className="text-jldBlue hover:text-jldRed transition-colors font-medium text-sm">
                 {info.action} →
               </button>
-            </motion.div>
+            </div>
           ))}
         </div>
-      </motion.div>
+      </div>
 
       {/* Contact Form & Map Section */}
-      <motion.div
+      <div
         className="max-w-7xl mx-auto px-6 pb-20"
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
       >
         <div className="grid lg:grid-cols-2 gap-12">
           {/* Contact Form */}
-          <motion.div
+          <div
             className="bg-white rounded-2xl shadow-xl p-8"
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            viewport={{ once: true }}
           >
             <h2 className="text-3xl font-light text-jldBlue mb-6">
               Send Us a <span className="text-jldRed font-normal">Message</span>
@@ -321,7 +364,7 @@ const ContactUsPage = () => {
                 />
               </div>
 
-              <motion.button
+              <button
                 type="submit"
                 disabled={isSubmitting}
                 className={`w-full py-4 px-6 rounded-lg font-medium transition-all ${
@@ -329,8 +372,6 @@ const ContactUsPage = () => {
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-jldBlue hover:bg-jldBlue/90 text-white"
                 }`}
-                whileHover={!isSubmitting ? { scale: 1.02 } : {}}
-                whileTap={!isSubmitting ? { scale: 0.98 } : {}}
               >
                 {isSubmitting ? (
                   <div className="flex items-center justify-center gap-2">
@@ -340,14 +381,12 @@ const ContactUsPage = () => {
                 ) : (
                   "Send Message"
                 )}
-              </motion.button>
+              </button>
 
               {/* Status Messages */}
               {submitStatus === 'success' && (
-                <motion.div
+                <div
                   className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
                 >
                   <div className="flex items-center gap-2">
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -355,14 +394,12 @@ const ContactUsPage = () => {
                     </svg>
                     Message sent successfully! We'll get back to you soon.
                   </div>
-                </motion.div>
+                </div>
               )}
 
               {submitStatus === 'error' && (
-                <motion.div
+                <div
                   className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
                 >
                   <div className="flex items-center gap-2">
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -370,18 +407,14 @@ const ContactUsPage = () => {
                     </svg>
                     Failed to send message. Please try again.
                   </div>
-                </motion.div>
+                </div>
               )}
             </form>
-          </motion.div>
+          </div>
 
           {/* Map & Location Info */}
-          <motion.div
+          <div
             className="space-y-8"
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            viewport={{ once: true }}
           >
             {/* Interactive Map Placeholder */}
             <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
@@ -445,9 +478,9 @@ const ContactUsPage = () => {
                 </p>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 };

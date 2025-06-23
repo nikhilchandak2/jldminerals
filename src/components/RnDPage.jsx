@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { motion } from "framer-motion";
+// Removed motion imports - using CSS fade effects instead
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { useHideScrollbar } from "../hooks/useHideScrollbar";
@@ -337,22 +337,7 @@ const RnDPage = () => {
         </div>
       </div>
 
-      <style jsx global>{`
-        /* Hide scrollbar for all elements */
-        * {
-          scrollbar-width: none; /* Firefox */
-        }
-        
-        *::-webkit-scrollbar {
-          display: none; /* Chrome, Safari, Edge */
-        }
-        
-        /* Ensure body can still scroll */
-        body {
-          overflow-y: auto;
-          overflow-x: hidden;
-        }
-      `}</style>
+
     </>
   );
 };

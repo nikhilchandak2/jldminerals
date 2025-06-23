@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { motion } from "framer-motion";
+// Removed motion imports - using CSS fade effects instead
 import { useNavigate } from "react-router-dom";
 import { useHideScrollbar } from "../hooks/useHideScrollbar";
 
@@ -98,40 +98,27 @@ const BlogsPage = () => {
 
             {/* Title Section */}
             <div className="mb-16 mt-12">
-              <motion.h1 
+              <h1 
                 className="text-5xl md:text-6xl lg:text-7xl font-light text-jldBlue mb-4 leading-none tracking-tight"
-                initial={{ opacity: 0, x: -30 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8, delay: 0.3 }}
               >
                 Our <span className="text-jldRed font-normal">Blogs</span>
-              </motion.h1>
+              </h1>
               
-              <motion.p 
+              <p 
                 className="text-xl md:text-2xl text-gray-500 mb-6 font-light leading-relaxed max-w-3xl"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8, delay: 0.5 }}
               >
                 Insights, innovations, and industry expertise from the world of minerals and mining
-              </motion.p>
+              </p>
 
-              <motion.div 
+              <div 
                 className="w-24 h-1 bg-gradient-to-r from-jldBlue to-jldRed"
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ duration: 0.8, delay: 0.7 }}
-                style={{ transformOrigin: 'left' }}
               />
             </div>
           </div>
 
       {/* Category Filter */}
-      <motion.div
+      <div
         className="max-w-7xl mx-auto px-6 py-12"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.4 }}
       >
         <div className="flex flex-wrap justify-center gap-4 mb-12">
           {categories.map((category) => (
@@ -151,11 +138,8 @@ const BlogsPage = () => {
 
         {/* Featured Blog */}
         {filteredBlogs.find(blog => blog.featured) && (
-          <motion.div
+          <div
             className="mb-16"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
           >
             <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
               <div className="grid md:grid-cols-2 gap-0">
@@ -192,24 +176,17 @@ const BlogsPage = () => {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
         )}
 
         {/* Blog Grid */}
-        <motion.div
+        <div
           className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
         >
           {filteredBlogs.filter(blog => !blog.featured).map((blog, index) => (
-            <motion.div
+            <div
               key={blog.id}
               className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 * index }}
-              whileHover={{ y: -5 }}
             >
               <div className="relative h-48 overflow-hidden">
                 <img
@@ -239,17 +216,14 @@ const BlogsPage = () => {
                   Read More →
                 </button>
               </div>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
 
         {/* No Results */}
         {filteredBlogs.length === 0 && (
-          <motion.div
+          <div
             className="text-center py-16"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6 }}
           >
             <div className="text-gray-400 mb-4">
               <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -258,17 +232,13 @@ const BlogsPage = () => {
             </div>
             <h3 className="text-xl text-gray-600 mb-2">No blogs found</h3>
             <p className="text-gray-500">Try selecting a different category</p>
-          </motion.div>
+          </div>
         )}
-      </motion.div>
+      </div>
 
       {/* Newsletter Subscription */}
-      <motion.div
+      <div
         className="bg-gradient-to-r from-jldBlue to-jldBlue/90 text-white py-16 px-6 mt-20"
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
       >
         <div className="max-w-4xl mx-auto text-center">
           <h3 className="text-3xl md:text-4xl font-light mb-6">
@@ -288,7 +258,7 @@ const BlogsPage = () => {
             </button>
           </div>
         </div>
-      </motion.div>
+      </div>
         </div>
       </div>
     </div>

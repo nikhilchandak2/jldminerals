@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+
+
 /* Optimized font loading and base styles */
 html {
   margin: 0;
@@ -26,14 +28,6 @@ body {
   /* Improve text rendering */
   text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
-  /* Hide scrollbar but allow scrolling for all pages */
-  -ms-overflow-style: none;  /* Internet Explorer 10+ */
-  scrollbar-width: none;  /* Firefox */
-}
-
-/* Hide scrollbar but allow scrolling for all pages */
-body::-webkit-scrollbar { 
-  display: none;  /* Safari and Chrome */
 }
 
 /* Optimize box model for better performance */
@@ -41,6 +35,27 @@ body::-webkit-scrollbar {
 *::before,
 *::after {
   box-sizing: border-box;
+}
+
+/* CSS Custom Properties for mobile viewport */
+:root {
+  --vh: 1vh;
+}
+
+/* Mobile viewport height fixes - AGGRESSIVE approach to eliminate white space */
+@media screen and (max-width: 768px) {
+  :root {
+    --vh: 1vh;
+  }
+  
+  /* Force all elements to respect the custom viewport height */
+  html {
+    height: calc(var(--vh, 1vh) * 100) !important;
+  }
+  
+  body {
+    height: calc(var(--vh, 1vh) * 100) !important;
+  }
 }
 
 /* Base section styling for better compatibility */
@@ -55,6 +70,91 @@ section {
   will-change: transform;
 }
 
+/* Mobile viewport height fixes - AGGRESSIVE approach to eliminate white space */
+@media screen and (max-width: 768px) {
+  html, body {
+    height: 100% !important;
+    min-height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  /* Only hide overflow on home page with fullpage.js */
+  body.fp-enabled {
+    overflow: hidden !important;
+  }
+  
+  #root {
+    height: 100% !important;
+    min-height: 100% !important;
+  }
+  
+  section {
+    height: calc(var(--vh, 1vh) * 100) !important;
+    min-height: calc(var(--vh, 1vh) * 100) !important;
+    max-height: calc(var(--vh, 1vh) * 100) !important;
+    position: relative !important;
+    overflow: hidden !important;
+  }
+  
+  /* Specifically target the Hero section */
+  section[data-section="hero"] {
+    height: calc(var(--vh, 1vh) * 100) !important;
+    min-height: calc(var(--vh, 1vh) * 100) !important;
+    max-height: calc(var(--vh, 1vh) * 100) !important;
+    position: relative !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Ensure fullpage.js sections don't cause white space */
+  .fp-section {
+    height: calc(var(--vh, 1vh) * 100) !important;
+    min-height: calc(var(--vh, 1vh) * 100) !important;
+    max-height: calc(var(--vh, 1vh) * 100) !important;
+  }
+  
+  /* Improve touch targets on mobile */
+  button, [role="button"], .cursor-pointer {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Hide navigation dots on mobile */
+  #fp-nav {
+    display: none !important;
+  }
+  
+  /* Specific fix for Products section mobile scrolling */
+  #products {
+    height: calc(var(--vh, 1vh) * 100) !important;
+    min-height: calc(var(--vh, 1vh) * 100) !important;
+    max-height: calc(var(--vh, 1vh) * 100) !important;
+    overflow: hidden !important;
+    position: relative !important;
+  }
+  
+  /* Prevent any overflow from the mobile layout transform */
+  #products > div {
+    overflow: hidden !important;
+  }
+}
+
+/* Root container - only prevent overflow for fullpage.js pages */
+#root {
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+}
+
+/* Only apply fixed positioning and hidden overflow when fullpage.js is active */
+body.fp-enabled #root {
+  overflow: hidden !important;
+  position: fixed !important;
+  top: 0;
+  left: 0;
+}
+
 /* Fullpage.js container optimization - only hide overflow for fullpage */
 #fullpage {
   height: 100vh;
@@ -65,9 +165,65 @@ section {
   backface-visibility: hidden;
 }
 
-/* Only hide body overflow when fullpage.js is active */
-.fp-enabled {
+/* Hide scrollbars but allow scrolling for product pages */
+.hide-scrollbar {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none !important;
+}
+
+/* Product page specific styles - allow scrolling without scrollbars */
+body.product-page {
+  overflow-y: auto !important;
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+body.product-page::-webkit-scrollbar {
+  display: none !important;
+}
+
+body.product-page #root {
+  overflow-y: auto !important;
+  position: relative !important;
+  height: auto !important;
+  min-height: 100vh !important;
+}
+
+/* Ensure main content containers can scroll */
+body.product-page .min-h-screen {
+  overflow-y: auto !important;
+}
+
+/* Fullpage.js enabled state - prevent scrolling only for fullpage pages */
+body.fp-enabled {
   overflow: hidden !important;
+}
+
+body.fp-enabled html {
+  overflow: hidden !important;
+}
+
+/* Default state - allow scrolling with hidden scrollbars */
+html {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+html::-webkit-scrollbar {
+  display: none !important;
+}
+
+body {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+body::-webkit-scrollbar {
+  display: none !important;
 }
 
 /* Accessibility improvements */
@@ -79,13 +235,12 @@ section {
   }
 }
 
-/* Focus visibility for better accessibility */
+/* Focus styles for accessibility */
 :focus-visible {
   outline: 2px solid #2b235e;
   outline-offset: 2px;
 }
 
-/* Remove default focus styles for mouse users */
 :focus:not(:focus-visible) {
   outline: none;
 }
@@ -102,7 +257,7 @@ section {
   }
 }
 
-/* Optional: Add some base styling for better performance */
+/* Ensure smooth transitions between sections on main page */
 .fp-viewing-hero .fp-section,
 .fp-viewing-about .fp-section,
 .fp-viewing-snapshot .fp-section,
@@ -111,5 +266,209 @@ section {
 .fp-viewing-rnd .fp-section,
 .fp-viewing-sustainability .fp-section,
 .fp-viewing-contact .fp-section {
-  transition: opacity 1s ease-in-out;
-} 
+  transition: opacity 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+}
+
+/* Desktop-only fade transitions - Only apply to desktop sections */
+@media screen and (min-width: 769px) {
+  /* Apply fade transitions only to desktop layouts */
+  .hidden.md\\:flex *:not(img):not(picture):not(video):not([role="button"]),
+  .hidden.md\\:block *:not(img):not(picture):not(video):not([role="button"]) {
+    transition: opacity 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+  }
+
+  /* Desktop hover effects with fade */
+  .hidden.md\\:flex button:not([role="button"]):hover, 
+  .hidden.md\\:flex a:not([role="button"]):hover, 
+  .hidden.md\\:flex .cursor-pointer:not([role="button"]):hover,
+  .hidden.md\\:block button:not([role="button"]):hover, 
+  .hidden.md\\:block a:not([role="button"]):hover, 
+  .hidden.md\\:block .cursor-pointer:not([role="button"]):hover {
+    opacity: 0.8 !important;
+  }
+}
+
+/* CRITICAL: Completely exclude role="button" elements from opacity effects */
+[role="button"], 
+[role="button"] *, 
+[role="button"]:hover, 
+[role="button"]:hover *,
+div[role="button"], 
+div[role="button"] *,
+div[role="button"]:hover,
+div[role="button"]:hover * {
+  opacity: 1 !important;
+  transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+}
+
+/* Images should not have opacity transitions - allow only transform/filter */
+img, picture, video {
+  transition: transform 0.5s ease-in-out, filter 0.5s ease-in-out !important;
+  opacity: 1 !important;
+}
+
+img:hover, picture:hover, video:hover {
+  opacity: 1 !important;
+}
+
+/* Preserve critical fullpage.js and product page functionality - EXCLUDE images */
+.fp-section, .fp-section *:not(img):not(picture):not(video), 
+body.product-page, body.product-page *:not(img):not(picture):not(video),
+body.fp-enabled, body.fp-enabled *:not(img):not(picture):not(video) {
+  /* Keep existing transition rules for these critical elements */
+  transition: opacity 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+}
+
+/* Loading and placeholder fade effects */
+.loading-placeholder, .lazy-image-container {
+  transition: opacity 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+}
+
+/* Mobile layout preservation - Ensure NO global transitions affect mobile */
+@media screen and (max-width: 768px) {
+  /* CRITICAL: Completely disable ALL global transitions for mobile - Clean slate approach */
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  /* Allow ONLY the specific transitions we need for mobile functionality */
+  .transition-opacity,
+  [class*="transition-opacity"] {
+    transition: opacity 0.5s ease-in-out !important;
+  }
+
+  /* Specific exception for Sustainability carousel cards */
+  .md\\:hidden [class*="duration-700"],
+  .md\\:hidden .transition-opacity.duration-700 {
+    transition: opacity 0.7s ease-in-out !important;
+  }
+
+  .animate-bounce {
+    animation: bounce 1s infinite !important;
+  }
+
+  .hover\\:scale-105:hover,
+  img:hover {
+    transition: transform 0.3s ease-in-out !important;
+  }
+
+  /* Preserve essential Tailwind responsive display classes */
+  .md\\:hidden {
+    display: flex !important;
+  }
+
+  .hidden {
+    display: none !important;
+  }
+}
+
+/* Desktop responsiveness - Ensure desktop shows correctly */
+@media screen and (min-width: 769px) {
+  .md\\:hidden {
+    display: none !important;
+  }
+
+  .hidden.md\\:flex {
+    display: flex !important;
+  }
+
+  .hidden.md\\:block {
+    display: block !important;
+  }
+}
+
+/* Ensure bounce animation works on ALL screen sizes */
+.animate-bounce {
+  animation: bounce 1s infinite !important;
+}
+
+/* Viewport-based responsive scaling for better cross-device experience */
+/* Only scale on very large screens (1920px+) to avoid laptop zoom issues */
+@media screen and (min-width: 1920px) {
+  /* 3XL screens (1920px+) - Scale content slightly */
+  html {
+    font-size: 18px;
+  }
+}
+
+@media screen and (min-width: 2560px) {
+  /* 4K screens (2560px+) - Scale content for 4K displays */
+  html {
+    font-size: 20px;
+  }
+}
+
+/* Container max-widths for better content scaling */
+.responsive-container {
+  width: 100%;
+  max-width: min(90vw, 1400px);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(1rem, 3vw, 2rem);
+  padding-right: clamp(1rem, 3vw, 2rem);
+}
+
+/* Responsive text scaling utilities - More conservative scaling */
+.text-responsive-hero {
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  line-height: 1.1;
+}
+
+.text-responsive-title {
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  line-height: 1.2;
+}
+
+.text-responsive-subtitle {
+  font-size: clamp(1.125rem, 2vw, 1.375rem);
+  line-height: 1.4;
+}
+
+.text-responsive-body {
+  font-size: clamp(0.875rem, 1.5vw, 1.125rem);
+  line-height: 1.6;
+}
+
+/* Responsive spacing utilities - Conservative scaling */
+.space-responsive-sm {
+  margin-bottom: clamp(1rem, 2vw, 1.5rem);
+}
+
+.space-responsive-md {
+  margin-bottom: clamp(2rem, 3vw, 3rem);
+}
+
+.space-responsive-lg {
+  margin-bottom: clamp(3rem, 4vw, 4rem);
+}
+
+/* Ensure mobile layouts are preserved */
+@media screen and (max-width: 768px) {
+  html {
+    font-size: 16px !important; /* Force standard mobile font size */
+  }
+  
+  .responsive-container {
+    max-width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  /* Override responsive text for mobile */
+  .text-responsive-hero {
+    font-size: clamp(2rem, 8vw, 3rem) !important;
+  }
+  
+  .text-responsive-title {
+    font-size: clamp(1.5rem, 6vw, 2rem) !important;
+  }
+  
+  .text-responsive-subtitle {
+    font-size: clamp(1rem, 4vw, 1.25rem) !important;
+  }
+  
+  .text-responsive-body {
+    font-size: clamp(0.875rem, 3vw, 1rem) !important;
+  }
+}

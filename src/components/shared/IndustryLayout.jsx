@@ -1,6 +1,7 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
-import { motion } from 'framer-motion';
+// Removed motion imports - using CSS fade effects instead
+import { useNavigate } from 'react-router-dom';
 
 const IndustryLayout = ({ 
   title, 
@@ -9,10 +10,19 @@ const IndustryLayout = ({
   heroImage, 
   heroTitle, 
   heroSubtitle, 
-  children 
+  children,
+  onBackClick
 }) => {
-  const handleBackToHome = () => {
-    window.location.href = '/';
+  const navigate = useNavigate();
+
+  const handleBack = () => {
+    if (onBackClick) {
+      onBackClick();
+    } else if (window.history.length > 1) {
+      navigate(-1); // Go back to previous page
+    } else {
+      navigate('/home#industries'); // Fallback to industries section
+    }
   };
 
   return (
@@ -42,7 +52,7 @@ const IndustryLayout = ({
             <span className="text-xl font-semibold">JLD Minerals</span>
           </div>
           <button 
-            onClick={handleBackToHome}
+            onClick={handleBack}
             className="px-4 py-2 border border-white text-white rounded hover:bg-white hover:text-jldBlue transition duration-300"
           >
             ← Back to Home
@@ -51,11 +61,8 @@ const IndustryLayout = ({
       </div>
 
       {/* Hero Section */}
-      <motion.div 
+      <div 
         className="relative h-96 bg-gradient-to-r from-jldBlue to-gray-800 text-white overflow-hidden"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1 }}
       >
         {heroImage && (
           <div className="absolute inset-0">
@@ -68,25 +75,19 @@ const IndustryLayout = ({
         )}
         <div className="relative z-10 flex items-center justify-center h-full text-center px-4">
           <div>
-            <motion.h1 
+            <h1 
               className="text-4xl md:text-6xl font-bold mb-4"
-              initial={{ y: 30, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.8 }}
             >
               {heroTitle}
-            </motion.h1>
-            <motion.p 
+            </h1>
+            <p 
               className="text-xl md:text-2xl text-gray-200"
-              initial={{ y: 30, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.5, duration: 0.8 }}
             >
               {heroSubtitle}
-            </motion.p>
+            </p>
           </div>
         </div>
-      </motion.div>
+      </div>
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-12">
@@ -103,7 +104,7 @@ const IndustryLayout = ({
             Get premium quality materials with consistent supply and expert technical support.
           </p>
           <button 
-            onClick={handleBackToHome}
+            onClick={() => navigate('/contact', { state: { from: '/industries' } })}
             className="px-8 py-3 bg-jldBlue text-white rounded-lg hover:bg-opacity-90 transition duration-300 text-lg font-semibold"
           >
             Contact Our Experts

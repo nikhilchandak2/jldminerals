@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
+// Removed motion imports - using CSS fade effects instead
 
 const LazyImage = ({ 
   src, 

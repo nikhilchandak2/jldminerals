@@ -1,7 +1,6 @@
 import React, { Suspense, lazy } from "react";
 import ReactDOM from "react-dom/client";
-import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
-import { AnimatePresence } from "framer-motion";
+import { createBrowserRouter, RouterProvider, Navigate, useNavigate } from "react-router-dom";
 import "./index.css";
 
 // Error Boundary is imported immediately as it's critical
@@ -25,12 +24,11 @@ const CareersPage = lazy(() => import("./components/CareersPage.jsx"));
 const ContactUsPage = lazy(() => import("./components/ContactUsPage.jsx"));
 const RnDPage = lazy(() => import("./components/RnDPage.jsx"));
 
-// Loading component for better UX during lazy loading
+// Optimized loading component - smaller and less intrusive
 const LoadingSpinner = () => (
-  <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50">
-    <div className="flex flex-col items-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-      <p className="text-gray-600 font-medium">Loading...</p>
+  <div className="min-h-screen flex items-center justify-center bg-white">
+    <div className="flex flex-col items-center opacity-30">
+      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-jldBlue"></div>
     </div>
   </div>
 );
@@ -44,9 +42,20 @@ const PageWrapper = ({ Component }) => (
   </ErrorBoundary>
 );
 
-// Optimized placeholder components - moved to separate functions to reduce bundle size
+// Optimized placeholder components with proper navigation
 const createPlaceholderPage = (title, description, applications) => {
-  const PlaceholderPage = () => (
+  const PlaceholderPage = () => {
+    const navigate = useNavigate();
+    
+    const handleBackClick = () => {
+      if (window.history.length > 1) {
+        navigate(-1); // Go back to previous page
+      } else {
+        navigate('/home'); // Fallback to home
+      }
+    };
+
+    return (
     <div className="min-h-screen bg-white px-6 py-20 text-center">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold mb-8 text-jldBlue">{title}</h1>
@@ -57,15 +66,16 @@ const createPlaceholderPage = (title, description, applications) => {
             {applications.map((app, index) => <li key={index}>{app}</li>)}
           </ul>
           <button 
-            onClick={() => window.location.href = '/home'}
+              onClick={handleBackClick}
             className="mt-8 px-6 py-2 bg-jldBlue text-white rounded hover:bg-opacity-80 transition duration-300"
           >
-            ← Back to Home
+              ← Back
           </button>
         </div>
       </div>
     </div>
   );
+  };
   return PlaceholderPage;
 };
 
@@ -92,16 +102,21 @@ const TableWarePage = createPlaceholderPage(
   ]
 );
 
+// Optimized error page component with proper navigation
+const ErrorPage = () => {
+  const navigate = useNavigate();
+  
+  const handleGoHome = () => {
+    navigate('/home');
+  };
 
-
-// Optimized error page component
-const ErrorPage = () => (
+  return (
   <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50">
     <div className="text-center p-8">
       <h1 className="text-2xl font-semibold text-gray-800 mb-2">Page Not Found</h1>
       <p className="text-gray-600 mb-6">The page you're looking for doesn't exist.</p>
       <button 
-        onClick={() => window.location.href = '/home'} 
+          onClick={handleGoHome}
         className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-300"
       >
         Go Home
@@ -109,6 +124,7 @@ const ErrorPage = () => (
     </div>
   </div>
 );
+};
 
 // Optimized router configuration
 const router = createBrowserRouter([
@@ -120,6 +136,39 @@ const router = createBrowserRouter([
     path: "/home",
     element: <PageWrapper Component={App} />,
     errorElement: <ErrorBoundary><ErrorPage /></ErrorBoundary>,
+  },
+  // Homepage section routes with clean URLs
+  {
+    path: "/hero",
+    element: <Navigate to="/home#hero" replace />,
+  },
+  {
+    path: "/about-us",
+    element: <Navigate to="/home#about" replace />,
+  },
+  {
+    path: "/global-snapshot", 
+    element: <Navigate to="/home#snapshot" replace />,
+  },
+  {
+    path: "/products",
+    element: <Navigate to="/home#products" replace />,
+  },
+  {
+    path: "/industries",
+    element: <Navigate to="/home#industries" replace />,
+  },
+  {
+    path: "/rnd",
+    element: <Navigate to="/home#rnd" replace />,
+  },
+  {
+    path: "/sustainability",
+    element: <Navigate to="/home#sustainability" replace />,
+  },
+  {
+    path: "/contact-us",
+    element: <Navigate to="/home#contact" replace />,
   },
   {
     path: "/about", 
@@ -190,11 +239,7 @@ const router = createBrowserRouter([
   },
 ]);
 
-// Optimized root component
-const Root = () => (
-  <AnimatePresence mode="wait">
-    <RouterProvider router={router} />
-  </AnimatePresence>
+// Simplified root component - removed AnimatePresence wrapper for better performance
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <RouterProvider router={router} />
 );
-
-ReactDOM.createRoot(document.getElementById("root")).render(<Root />);
