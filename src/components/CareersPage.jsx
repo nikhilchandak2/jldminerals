@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 // Removed motion imports - using CSS fade effects instead
 import { useNavigate } from "react-router-dom";
 import { useHideScrollbar } from "../hooks/useHideScrollbar";
-import emailjs from '@emailjs/browser';
 
 const CareersPage = () => {
   useHideScrollbar();
@@ -104,71 +103,25 @@ const CareersPage = () => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    try {
-      // EmailJS Configuration - Using Vite environment variables
-      const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-      const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
-      const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
-
-
-
-      // Check if environment variables are loaded
-      if (!SERVICE_ID || !TEMPLATE_ID || !PUBLIC_KEY) {
-        console.error('EmailJS configuration missing:', {
-          SERVICE_ID: !!SERVICE_ID,
-          TEMPLATE_ID: !!TEMPLATE_ID,
-          PUBLIC_KEY: !!PUBLIC_KEY
-        });
-        setSubmitMessage('Email configuration error. Please contact support.');
-        setIsSubmitting(false);
-        return;
+    // Simulate form processing
+    setTimeout(() => {
+      setSubmitMessage('Thank you for your application! We will review your submission and get back to you soon.');
+      setFormData({
+        fullName: '',
+        email: '',
+        phone: '',
+        position: '',
+        experience: '',
+        message: '',
+        resume: null
+      });
+      // Reset file input
+      const fileInput = document.getElementById('resume');
+      if (fileInput) {
+        fileInput.value = '';
       }
-
-      // Prepare template parameters
-      const templateParams = {
-        fullName: formData.fullName,
-        email: formData.email,
-        phone: formData.phone || 'Not provided',
-        position: formData.position,
-        experience: formData.experience,
-        message: formData.message || 'No additional message provided',
-        resume: formData.resume ? formData.resume.name : 'No resume uploaded'
-      };
-
-
-
-      // Send email using EmailJS
-      const response = await emailjs.send(
-        SERVICE_ID,
-        TEMPLATE_ID,
-        templateParams,
-        PUBLIC_KEY
-      );
-
-      if (response.status === 200) {
-
-        setSubmitMessage('Application submitted successfully! We will contact you soon.');
-        setFormData({
-          fullName: '',
-          email: '',
-          phone: '',
-          position: '',
-          experience: '',
-          message: '',
-          resume: null
-        });
-        // Reset file input
-        document.getElementById('resume').value = '';
-      } else {
-        console.error('❌ EmailJS response error:', response);
-        setSubmitMessage('Error submitting application. Please try again.');
-      }
-    } catch (error) {
-      console.error('EmailJS Error:', error);
-      setSubmitMessage('Error submitting application. Please try again.');
-    }
-    
-    setIsSubmitting(false);
+      setIsSubmitting(false);
+    }, 2000); // Simulate 2 second processing time
   };
 
   return (
