@@ -1,4 +1,4 @@
-import{r as o}from"./index-kDbPb6MD.js";const n=()=>{o.useEffect(()=>{const e=document.createElement("style");return e.textContent=`
+import{r as o}from"./index-D4Gk0upl.js";const n=()=>{o.useEffect(()=>{const e=document.createElement("style");return e.textContent=`
       .hide-scrollbar {
         -ms-overflow-style: none;  /* Internet Explorer 10+ */
         scrollbar-width: none;  /* Firefox */
