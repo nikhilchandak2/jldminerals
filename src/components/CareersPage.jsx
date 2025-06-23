@@ -237,6 +237,7 @@ const CareersPage = () => {
                 method="POST"
                 data-netlify="true"
                 data-netlify-honeypot="bot-field"
+                encType="multipart/form-data"
               >
                 {/* Hidden field for Netlify */}
                 <input type="hidden" name="form-name" value="career-application" />
