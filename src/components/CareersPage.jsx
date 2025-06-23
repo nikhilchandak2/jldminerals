@@ -103,25 +103,42 @@ const CareersPage = () => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate form processing
-    setTimeout(() => {
-      setSubmitMessage('Thank you for your application! We will review your submission and get back to you soon.');
-      setFormData({
-        fullName: '',
-        email: '',
-        phone: '',
-        position: '',
-        experience: '',
-        message: '',
-        resume: null
+    try {
+      // Create FormData object for Netlify Forms
+      const formData_netlify = new FormData(e.target);
+      
+      // Submit to Netlify
+      const response = await fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(formData_netlify).toString()
       });
-      // Reset file input
-      const fileInput = document.getElementById('resume');
-      if (fileInput) {
-        fileInput.value = '';
+
+      if (response.ok) {
+        setSubmitMessage('Thank you for your application! We will review your submission and get back to you soon.');
+        setFormData({
+          fullName: '',
+          email: '',
+          phone: '',
+          position: '',
+          experience: '',
+          message: '',
+          resume: null
+        });
+        // Reset file input
+        const fileInput = document.getElementById('resume');
+        if (fileInput) {
+          fileInput.value = '';
+        }
+      } else {
+        throw new Error('Form submission failed');
       }
-      setIsSubmitting(false);
-    }, 2000); // Simulate 2 second processing time
+    } catch (error) {
+      console.error('Form submission error:', error);
+      setSubmitMessage('Error submitting application. Please try again or contact us directly.');
+    }
+    
+    setIsSubmitting(false);
   };
 
   return (
@@ -213,7 +230,24 @@ const CareersPage = () => {
             </div>
 
             <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6 sm:p-8 md:p-12">
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form 
+                onSubmit={handleSubmit} 
+                className="space-y-6"
+                name="career-application"
+                method="POST"
+                data-netlify="true"
+                data-netlify-honeypot="bot-field"
+              >
+                {/* Hidden field for Netlify */}
+                <input type="hidden" name="form-name" value="career-application" />
+                
+                {/* Honeypot field for spam protection */}
+                <div style={{ display: 'none' }}>
+                  <label>
+                    Don't fill this out if you're human: <input name="bot-field" />
+                  </label>
+                </div>
+
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">

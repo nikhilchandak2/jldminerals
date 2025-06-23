@@ -99,29 +99,32 @@ const ContactUsPage = () => {
     setSubmitStatus(null);
 
     try {
-      // Simulate API call - replace with actual backend endpoint
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Create FormData object for Netlify Forms
+      const formData_netlify = new FormData(e.target);
       
-      // Here you would typically send the form data to your backend
-      // const response = await fetch('/api/contact', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify(formData),
-      // });
-
-      setSubmitStatus('success');
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        company: "",
-        subject: "",
-        message: "",
-        inquiry_type: "general"
+      // Submit to Netlify
+      const response = await fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(formData_netlify).toString()
       });
+
+      if (response.ok) {
+        setSubmitStatus('success');
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          company: "",
+          subject: "",
+          message: "",
+          inquiry_type: "general"
+        });
+      } else {
+        throw new Error('Form submission failed');
+      }
     } catch (error) {
+      console.error('Form submission error:', error);
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
@@ -254,7 +257,24 @@ const ContactUsPage = () => {
               Fill out the form below and we'll get back to you within 24 hours.
             </p>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form 
+              onSubmit={handleSubmit} 
+              className="space-y-6"
+              name="contact-form"
+              method="POST"
+              data-netlify="true"
+              data-netlify-honeypot="bot-field"
+            >
+              {/* Hidden field for Netlify */}
+              <input type="hidden" name="form-name" value="contact-form" />
+              
+              {/* Honeypot field for spam protection */}
+              <div style={{ display: 'none' }}>
+                <label>
+                  Don't fill this out if you're human: <input name="bot-field" />
+                </label>
+              </div>
+
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
